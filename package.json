@@ -8,7 +8,8 @@
     "start": "node src/index.js",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "demo": "node src/crud-demo.js"
   },
   "repository": {
     "type": "git",
@@ -23,6 +24,12 @@
   },
   "homepage": "https://github.com/WilliamRossCrane/sportz-websockets#readme",
   "dependencies": {
-    "express": "^5.2.1"
+    "dotenv": "^17.2.3",
+    "drizzle-orm": "^0.45.1",
+    "express": "^5.2.1",
+    "pg": "^8.17.2"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.8"
   }
 }
