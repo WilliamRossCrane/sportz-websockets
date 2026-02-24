@@ -1,4 +1,4 @@
-# ⚡ Sportz – Real-Time Broadcast Engine
+# ⚽ Sportz – Real-Time Broadcast Engine
 
 ![Project Status](https://img.shields.io/badge/status-in--progress-yellow)
 
