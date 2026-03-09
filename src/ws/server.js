@@ -1,4 +1,4 @@
-import { WebSocketServer, WebSocket } from "ws";
+import { WebSocket, WebSocketServer } from "ws";
 import { wsArcjet } from "../arcjet.js";
 
 const matchSubscribers = new Map();
@@ -7,6 +7,7 @@ function subscribe(matchId, socket) {
   if (!matchSubscribers.has(matchId)) {
     matchSubscribers.set(matchId, new Set());
   }
+
   matchSubscribers.get(matchId).add(socket);
 }
 
@@ -28,6 +29,20 @@ function cleanupSubscriptions(socket) {
   }
 }
 
+function sendJson(socket, payload) {
+  if (socket.readyState !== WebSocket.OPEN) return;
+
+  socket.send(JSON.stringify(payload));
+}
+
+function broadcastToAll(wss, payload) {
+  for (const client of wss.clients) {
+    if (client.readyState !== WebSocket.OPEN) continue;
+
+    client.send(JSON.stringify(payload));
+  }
+}
+
 function broadcastToMatch(matchId, payload) {
   const subscribers = matchSubscribers.get(matchId);
   if (!subscribers || subscribers.size === 0) return;
@@ -35,7 +50,7 @@ function broadcastToMatch(matchId, payload) {
   const message = JSON.stringify(payload);
 
   for (const client of subscribers) {
-    if (client.readyState !== WebSocket.OPEN) {
+    if (client.readyState === WebSocket.OPEN) {
       client.send(message);
     }
   }
@@ -46,11 +61,11 @@ function handleMessage(socket, data) {
 
   try {
     message = JSON.parse(data.toString());
-  } catch (e) {
+  } catch {
     sendJson(socket, { type: "error", message: "Invalid JSON" });
   }
 
-  if (message?.type === subscribe && Number.isInteger(message.matchId)) {
+  if (message?.type === "subscribe" && Number.isInteger(message.matchId)) {
     subscribe(message.matchId, socket);
     socket.subscriptions.add(message.matchId);
     sendJson(socket, { type: "subscribed", matchId: message.matchId });
@@ -61,18 +76,6 @@ function handleMessage(socket, data) {
     unsubscribe(message.matchId, socket);
     socket.subscriptions.delete(message.matchId);
     sendJson(socket, { type: "unsubscribed", matchId: message.matchId });
-  }
-}
-
-function sendJson(socket, payload) {
-  if (socket.readyState !== WebSocket.OPEN) return;
-  socket.send(JSON.stringify(payload));
-}
-
-function broadcastToAll(wss, payload) {
-  for (const client of wss.clients) {
-    if (client.readyState !== WebSocket.OPEN) continue;
-    client.send(JSON.stringify(payload));
   }
 }
 
@@ -116,16 +119,19 @@ export function attachWebSocketServer(server) {
     });
   });
 
-  wss.on("connection", (socket, req) => {
+  wss.on("connection", async (socket, req) => {
     socket.isAlive = true;
-
     socket.on("pong", () => {
       socket.isAlive = true;
     });
 
     socket.subscriptions = new Set();
 
-    socket.on("message", (data) => handleMessage(socket, data));
+    sendJson(socket, { type: "welcome" });
+
+    socket.on("message", (data) => {
+      handleMessage(socket, data);
+    });
 
     socket.on("error", () => {
       socket.terminate();
@@ -134,8 +140,6 @@ export function attachWebSocketServer(server) {
     socket.on("close", () => {
       cleanupSubscriptions(socket);
     });
-
-    sendJson(socket, { type: "welcome" });
 
     socket.on("error", console.error);
   });
