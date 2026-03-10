@@ -1,8 +1,8 @@
-# ⚽ Sportz – Real-Time Broadcast Engine
+# ⚽ Sportz Websocket – Real-Time Broadcast Engine
 
-![Project Status](https://img.shields.io/badge/status-in--progress-yellow)
+![Project Status](https://img.shields.io/badge/status-finished-brightgreen)
 
-This project is currently **in progress** and is being built as part of the JavaScript Mastery WebSockets Crash Course.
+This project is **finished** and was built as part of the JavaScript Mastery WebSockets Crash Course.
 
 The goal of this project is to design and implement a **high-frequency real-time broadcast engine** capable of delivering live match scores, commentary, and ball-by-ball updates to **100,000+ concurrent users** with sub-second latency.
 
@@ -42,14 +42,10 @@ Outlines key technical learnings, challenges faced, and how this project maps to
 - **MongoDB & Mongoose** – Data persistence and schema modeling
 - **Arcjet** – Security and traffic protection
 - **Site24x7** – Application performance monitoring
-- **Hostinger** – Deployment platform
 
 ---
 
 ## 🔋 Features
-
-👉 **High-Frequency Broadcast Engine**  
-Efficiently distributes live match updates to thousands of concurrent WebSocket clients with sub-second latency.
 
 👉 **WebSocket Server Architecture**  
 Manages persistent connections, handles message events, and implements scalable broadcast patterns.
@@ -78,7 +74,6 @@ Configured for scalable deployment with database seeding and performance optimis
 
 - Persistent WebSocket connections
 - Efficient broadcast patterns
-- Horizontal scalability
 - Fault tolerance
 - Sub-second update latency
 - Separation of ingestion (REST) and distribution (WebSocket)
@@ -103,9 +98,15 @@ npm install
 
 Create a .env file in the root of your project and add the following:
 
-PORT=8000
-MONGODB_URI=
-ARCJET_KEY=
+- DATABASE_URL="YOUR_DATABASE_KEY"
+- PORT=8000
+- HOST=0.0.0.0
+
+- ARCJET_KEY="YOUR_ARCJET_KEY"
+- ARCJET_ENV="development"
+
+- API_URL="http://localhost:8000"
+- API_URL="YOUR_REAL_PRODUCTION_URL"
 
 ### 🚀 Run the Project Locally
 
