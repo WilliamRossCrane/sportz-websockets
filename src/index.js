@@ -20,6 +20,7 @@ app.get("/", (req, res) => {
   res.send("Hello from Express server!");
 });
 
+// Comment out for Seed
 app.use(securityMiddleware());
 
 app.use("/matches", matchRouter);
